@@ -19,11 +19,11 @@ namespace hungary_togit
 
         public int Lines = 0;
         public int key = 0;
-        Dictionary<int, Point> dNon;//מילון אברים "אסורים"
-        Dictionary<int, Point> d;//מילון אברים "מותרים"
-        int[] linesoptimal;//מערך שורות מוקצות
-        int[] linesoNotptimal;//מערך שורות   לא מוקצות
-        int[] cells;//מערך עמודות
+        Dictionary<int, Point> dNon;//Dictionary of "forbidden" organs
+        Dictionary<int, Point> d;//Dictionary of "permitted" organs
+        int[] linesoptimal;//array of allocated rows
+        int[] linesoNotptimal;//An array of unallocated rows
+        int[] cells;//column array
         public List<int> lstNonOptimalRow = new List<int>();//list of rows without plalcment
         public List<int> lstOptimalRow = new List<int>();//list of rows with allocated
         public List<int> lstNonOptimalCoulnm = new List<int>();//list of coulnm without allocated
@@ -100,12 +100,12 @@ namespace hungary_togit
 
         }
         public bool IsFind(List<int> l, Dictionary<int, List<int>> dr) => dr.Values.Contains(l);
-        //פעולה המקבלת מטריצה ומחזירה את תת המטריצה שלה
+        // returns the submatrix
         public int[,] GetSubmatrix(int[,] mat, int row, int coulnm)
         {
             int[,] mat1 = new int[mat.GetLength(0) - 1, mat.GetLength(0) - 1];
             int r = 0, c = 0;
-            //הכנת התת מטריצה
+            //making the submatrix
             for (int i = 0; i < mat.GetLength(0); i++)
             {
                 for (int j = 0; j < mat.GetLength(0); j++)
@@ -126,7 +126,7 @@ namespace hungary_togit
             }
             return mat1;
         }
-        //מחזירה מילון תוצאות
+        //Returns a dictionary of results
         public Dictionary<int, List<int>> LstFinalResult(int[,] mat)
         {
             Dictionary<int, List<int>> d = new Dictionary<int, List<int>>();
@@ -137,9 +137,9 @@ namespace hungary_togit
             {
                 if (mat[0, i] == 0)
                 {
-                    m = GetSubmatrix(mat, 0, i);//תת מטריצה נוכחית
+                    m = GetSubmatrix(mat, 0, i);//current submatrix
                     int firstInLst = matOrginal[0, i];
-                    Orginalm = GetSubmatrix(matOrginal, 0, i);//תת מטריצה מקורית נכון
+                    Orginalm = GetSubmatrix(matOrginal, 0, i);//A correct original submatrix
                     if (Rec(m))
                     {
                         m = GetSubmatrix(mat, 0, i);
@@ -205,7 +205,7 @@ namespace hungary_togit
 
         }
 
-        //חיסור לשורה לא מכוסה 
+        //Subtraction to an uncovered row
         public void UnCoveredLine(int mininmat)
         {
             for (int i = 0; i < globalmat.GetLength(0); i++)
@@ -218,21 +218,20 @@ namespace hungary_togit
                 }
             }
         }
-        //הוספה לעמודה מכוסה
+        //Adding to the column is covered
         public void CoverColunm(int mininmat)
         {
             for (int i = 0; i < globalmat.GetLength(0); i++)
             {
                 for (int j = 0; j < globalmat.GetLength(0); j++)
                 {
-                    //הוספה לעמודה  מכוסה
-                    // if (isCoulnmInD(j) || IsInDCouknm(globalmat[i, j], j) && !isrowInD(i))
+                    
                     if (isCoulnmInD(j) || IsInDCouknm(globalmat[i, j], j) && !isrowInD(i))
                         globalmat[i, j] += mininmat;
                 }
             }
         }
-        ////הוספה למשהו שמכוסה פעמיים
+        //adding to something that is covered twice
         public void Addtodouble(int mininmat)
         {
             for (int i = 0; i < globalmat.GetLength(0); i++)
@@ -246,7 +245,7 @@ namespace hungary_togit
         }
 
 
-        //פונקציה רקורסיבית אשר מחזירה עבור תת מטריצה האם הוא 0
+        //A recursive function that returns if a submatrix received as a parameter is equal to zero
         public bool Rec(int[,] mat)
         {
             if (mat.GetLength(0) == 0)
@@ -292,12 +291,12 @@ namespace hungary_togit
         }
 
 
-        //פעולה המקבלת מטריצה ומחזירה את תת המטריצה שלה
+        //A function that accepts a matrix and returns its submatrix
         public int[,] FinalResult(int[,] mat, int row, int coulnm)
         {
             int[,] mat1 = new int[mat.GetLength(0) - 1, mat.GetLength(0) - 1];
             int r = 0, c = 0;
-            //הכנת התת מטריצה
+            //making the submatrix
             for (int i = 0; i < mat.GetLength(0); i++)
             {
                 for (int j = 0; j < mat.GetLength(0); j++)
@@ -319,7 +318,7 @@ namespace hungary_togit
         {
             int[,] mat1 = new int[mat.GetLength(0) - 1, mat.GetLength(0) - 1];
             int r = 0, c = 0;
-            //הכנת התת מטריצה
+            
             for (int i = 0; i < mat.GetLength(0); i++)
             {
                 for (int j = 0; j < mat.GetLength(0); j++)
@@ -338,7 +337,7 @@ namespace hungary_togit
             }
             return mat1;
         }
-        /// פונקציה המקבלת מטריצה לאחר ביצוע "הונגרי" ומחזירה את כל הפתרונות האפשריים של תת מטריצה מסוים
+        /// A function that receives a matrix after performing the "Hungarian operations" and returns all possible solutions of a certain submatrix
         /// </summary>
         /// <param name = "mat" ></ param >
         /// < param name="matorginal"></param>
@@ -390,12 +389,12 @@ namespace hungary_togit
             }
             return lstSlo;
         }
-        //הכנסה למילון כל הערכים שבשורה i
+        //Inserting into the dictionary all the values in line i
 
         public void EnterToRowDictanery(int index, List<int> lstValues) => Drows.Add(index, lstValues);
         public void EnterToCoulnmDictanery(int index, List<int> lstVales) => Dcoulnms.Add(index, lstVales);
 
-        //יצירת רשימה של ערכים בשורה i
+        //Making list of values in line i
         public List<int> craeteValyeListRow(int index, int tutors, int[,] mat)
         {
             List<int> lst = new List<int>();
@@ -405,7 +404,7 @@ namespace hungary_togit
             }
             return lst;
         }
-        //יצירת רשימה של ערכים בשורה j
+        /making list of values in coulnm  j
         public List<int> craeteValyeListCoulnm(int index, int apprentice, int[,] mat)
         {
             List<int> lst = new List<int>();
@@ -415,7 +414,7 @@ namespace hungary_togit
             }
             return lst;
         }
-        //סימון  השורות ב 0 ללא השיבוץ
+        //Mark the rows with 0 without assignment
         public void CoverageLines(int[,] mat)
         {
             for (int i = 0; i < mat.GetLength(0); i++)
@@ -424,7 +423,7 @@ namespace hungary_togit
                 if (l > 1 && !isrowInD(i))
                 {
                     Lines++;
-                    //סימון השורה כלא משובצת
+                    //Marking the row as unassigned
                     lstNonOptimalRow = craeteValyeListRow(i, mat.GetLength(1), mat);
                     EnterToRowDictanery(i, lstNonOptimalRow);
 
@@ -450,7 +449,7 @@ namespace hungary_togit
             }
             return false;
         }
-        //סימון "באיקסים" את ה0 שלא יכולים להיות כמוקצים
+        ////Mark with X the zeros that cannot be assigned
         public void MarkedX(int[,] mat, int row, int cell)
         {
             for (int i = 0; i < mat.GetLength(0); i++)
@@ -462,7 +461,7 @@ namespace hungary_togit
                         Point p = new Point(i, r);
                         if (mat[i, r] == 0 && !d.Values.Contains(p) && !dNon.Values.Contains(p))
                         {
-                            //סימון "x" על 0 זה
+                            //Mark X on this zero
                             Point p1 = new Point(i, r);
                             dNon.Add(key++, p1);
                         }
@@ -475,7 +474,7 @@ namespace hungary_togit
                         Point p = new Point(c, i);
                         if (mat[c, i] == 0 && !d.Values.Contains(p))
                         {
-                            //סימון "x" על 0 זה
+                            //Mark X on this zero
                             Point p1 = new Point(c, i);
                             dNon.Add(key++, p1);
                         }
@@ -483,7 +482,7 @@ namespace hungary_togit
                 }
             }
         }
-        //בודק האם יש 0 במטריצה שלא נמצא באף מילון
+        //Checks if there is a 0 in the matrix that is not found in any dictionary
         public bool iSZero(int[,] mat)
         {
 
@@ -530,7 +529,7 @@ namespace hungary_togit
             return count;
 
         }
-        //שלב 1
+        //step1
         public void step1(int[,] mat)
         {
 
@@ -539,7 +538,7 @@ namespace hungary_togit
             while (!iSZero(mat))
             {
                 flag = false;
-                //אפסים בשורות
+                //allocated in rows
                 for (int i = 0; i < mat.GetLength(0); i++)
                 {
                     int zeroinrow = ZeroInLine(mat, i, mat.GetLength(0));
@@ -561,7 +560,7 @@ namespace hungary_togit
                     }
                 }
 
-                //אפסים בעמודות
+                //allicated in coulnms
                 for (int i = 0; i < mat.GetLength(0); i++)
                 {
                     for (int j = 0; j < mat.GetLength(1); j++)
@@ -583,6 +582,7 @@ namespace hungary_togit
                         }
                     }
                 }
+                //arbitrary choice
                 if (flag == false)
                 {
                     for (int i = 0; i < mat.GetLength(0); i++)
@@ -609,17 +609,17 @@ namespace hungary_togit
             bool flag = false;
             for (int i = 0; i < mat.GetLength(0); i++)
             {
-                if (linesoptimal[i] == 0)//אם זה שורה לא מסומנת
+                if (linesoptimal[i] == 0)//If it is an unchecked line
                 {
                     if (!optimalR.Contains(i))
-                        optimalR.Add(i);//סימון בv  את השורה 
+                        optimalR.Add(i);//Mark the row with a V
                     for (int a = 0; a < mat.GetLength(0); a++)
                     {
                         Point p = new Point(i, a);
-                        if (mat[i, a] == 0 && dNon.Values.Contains(p) && cells[a] == 0)//אם נמצא בה 0 כלשהוא
+                        if (mat[i, a] == 0 && dNon.Values.Contains(p) && cells[a] == 0)//If there is any zero in the row
                         {
-                            cells[a] = 1;//סימון העמודה
-                            flag = true;//אם יש שינוי
+                            cells[a] = 1;//column marking
+                            flag = true;
                         }
                     }
                 }
@@ -631,23 +631,23 @@ namespace hungary_togit
             bool flag = false;
             for (int i = 0; i < mat.GetLength(0); i++)
             {
-                if (cells[i] == 1)//אם   העמודה מסומנת וגם לשורה יש הקצאה 
+                if (cells[i] == 1)//If the column is checked and the row also has an assignment 
                 {
                     for (int x = 0; x < mat.GetLength(0); x++)
                     {
                         Point p = new Point(x, i);
-                        if (d.Values.Contains(p))//סימון  מוקצה
+                        if (d.Values.Contains(p))//markup is assigned
                         {
                             if (!optimalR.Contains(p.X))
                                 optimalR.Add(p.X);
                             linesoNotptimal[x] = 1;
                             linesoptimal[x] = 0;
                             // linesoptimal[x] = 0;
-                            flag = true;//אם יש שינוי
+                            flag = true;//If there is a change
                         }
                     }
                 }
-                linesoNotptimal[i] = 1;//סימון כשורה לא מסומנת
+                linesoNotptimal[i] = 1;//Mark as unchecked
             }
             return flag;
         }
@@ -663,7 +663,7 @@ namespace hungary_togit
                 }
                 for (int j = 0; j < mat.GetLength(0); j++)
                 {
-                    if (cells[j] == 1 && !isCoulnmInD(j))//אם העמודה מוקצה
+                    if (cells[j] == 1 && !isCoulnmInD(j))//If the column is assigned
                     {
                         lstNonOptimalCoulnm = craeteValyeListCoulnm(j, mat.GetLength(0), mat);
                         Dcoulnms.Add(j, lstNonOptimalCoulnm);
@@ -674,7 +674,7 @@ namespace hungary_togit
             }
         }
 
-        //   line מס אפסים בשורה  
+        //   Number of zeros in the line 
         public int ZeroInLine(int[,] mat, int line, int tutors)
         {
             int count = 0;
@@ -686,7 +686,7 @@ namespace hungary_togit
             }
             return count;
         }
-        //   colum  מס אפסים בעמודה  
+        //   colum  Number of zeros in the 
         public int ZeroInColum(int[,] mat, int colum, int apprentices)
         {
             int count = 0;
@@ -697,21 +697,7 @@ namespace hungary_togit
             }
             return count;
         }
-
-        //בדיקה האם קיים שיבוץ אופטימלי
-        public bool IsOptimal(int[,] mat, int apprentices, int tutors)
-        {
-            for (int i = 0; i < apprentices; i++)
-            {
-                int l = ZeroInLine(mat, i, mat.GetLength(0));
-                int c = ZeroInColum(mat, i, mat.GetLength(0));
-                if (l > 1 || c > 1)
-                    return false;
-                continue;
-            }
-            return true;
-        }
-        //ערך מינימלי בשורה - שלב 1
+        //Minimum value in a row - step 1
         public int GetMinValueInRow(int[,] mat, int coulm, int line)
         {
             int min = 10000000;
@@ -734,7 +720,7 @@ namespace hungary_togit
             }
             return min;
         }
-        //שורות בדיקה האם מס מסוים נמצא במילון
+        //Checking whether a certain value is found in the row dictionary
         public bool IsInDRow(int num, int row)
         {
             foreach (KeyValuePair<int, List<int>> kvp in Drows)
@@ -751,7 +737,7 @@ namespace hungary_togit
             }
             return false;
         }
-        //בדיקה האם ערך מסוים נמצא במילון עמודות
+        //Checking whether a certain value is found in a column dictionary
         public bool IsInDCouknm(int num, int coulnm)
         {
             foreach (KeyValuePair<int, List<int>> kvp in Dcoulnms)
@@ -768,7 +754,7 @@ namespace hungary_togit
             }
             return false;
         }
-        //הפחתת הערך המינימלי שלא מכוסה
+        //Reducing the minimum value not covered
         public int GetMinValueInMat(int[,] mat)
         {
             int min = 10000;
@@ -776,7 +762,7 @@ namespace hungary_togit
             {
                 for (int j = 0; j < mat.GetLength(1); j++)
                 {
-                    //אם הערך הנוכחי לא 0 וגם קטן מהמינימום וגם 
+                    //If the current value is not 0 and also less than the minimum 
                     if (mat[i, j] != 0 && mat[i, j] < min && !isCoulnmInD(j) && !isrowInD(i))
                         min = (int)mat[i, j];
                 }
@@ -796,26 +782,27 @@ namespace hungary_togit
             int row = mat.GetLength(0);
             int coulm = mat.GetLength(1);
             int[,] currentMat = mat;
-            //שלב 1
+            //step1
             for (int g = 0; g < row; g++)
             {
-                //i ערך מינימילי בשורה 
+                // minimal value in row i
                 min = GetMinValueInRow(mat, coulm, g);
-                //  i הפחתת ערך מינימלי ב שורה           
+                // Reduction of minimum value in row i          
                 for (int x = 0; x < coulm; x++)
                     currentMat[g, x] -= min;
             }
-            //שלב 2
+            //step2
             for (int o = 0; o < coulm; o++)
             {
-                // j ערך מינימילי בעמודה
+                //  Minimum value in the column j
                 min = GetMinValueInColumn(mat, row, o);
-                //  j הפחתת ערך מינימלי בעמודה  
+                //   Decreasing the minimum value in a column j
                 for (int c = 0; c < row; c++)
                 {
                     currentMat[c, o] -= min;
                 }
             }
+            //Finding the minimum number of lines to cover the zeros
             while (Lines < currentMat.GetLength(0))
             {
                 Lines = 0;
@@ -838,25 +825,13 @@ namespace hungary_togit
                     isChangeStep3 = Step3(currentMat);
                 }
                 Step5(currentMat);
-                if (Lines < currentMat.GetLength(0) && Drows.Count < currentMat.GetLength(0))
-                //שלב 5
+                if (Lines < currentMat.GetLength(0))
                 {
 
                     minInMat = GetMinValueInMat(currentMat);
                     Addtodouble(minInMat);
                     UnCoveredLine(minInMat);
                 }
-                if (Drows.Count + Dcoulnms.Count == currentMat.GetLength(0) && Drows.Count > 0 && Dcoulnms.Count > 0)
-                {
-                    isChangeStep2 = Step2(currentMat);
-                    isChangeStep3 = Step3(currentMat);
-                    while (isChangeStep2 && isChangeStep3)
-                    {
-                        isChangeStep2 = Step2(currentMat);
-                        isChangeStep3 = Step3(currentMat);
-                    }
-                }
-
             }
         }
     }
